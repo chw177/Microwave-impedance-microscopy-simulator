@@ -1,7 +1,6 @@
 # mimsim — a microwave impedance microscopy (MIM) electronics simulator
 
-A traveling-wave / S-parameter simulator for the full MIM signal chain, following
-Barber, Ma & Shen, *Nat. Rev. Phys.* **4**, 61 (2022). It lets you **request the signal
+A traveling-wave / S-parameter simulator for the full MIM signal chain. It lets you **request the signal
 at the input or output of any component**, in both the **time domain** (RF waveform) and
 the **frequency domain** (carrier + sidebands), while controlling attenuators and phase
 shifters by **voltage** and tuning the source **amplitude and frequency**.
