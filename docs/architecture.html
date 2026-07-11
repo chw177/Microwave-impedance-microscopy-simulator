@@ -1,0 +1,320 @@
+<title>mimsim architecture diagrams</title>
+<style>
+  :root {
+    --bg: #eaeef3; --card: #ffffff; --ink: #131a23; --muted: #5c6875;
+    --line: #cdd5df; --line2: #9aa6b3;
+    --rf: #0e7f8c; --rf-soft: #d6eef1;
+    --code: #4b53cf; --code-soft: #e5e6fb;
+    --out: #1f8f66; --out-soft: #d7f0e5;
+    --shadow: 0 1px 2px rgba(20,30,45,.06), 0 6px 20px rgba(20,30,45,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c1015; --card: #151b24; --ink: #e7edf4; --muted: #92a0b1;
+      --line: #29333f; --line2: #3d4a58;
+      --rf: #43d1de; --rf-soft: #0f3239;
+      --code: #9aa1ff; --code-soft: #1e2340;
+      --out: #4fd39a; --out-soft: #123329;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #eaeef3; --card: #ffffff; --ink: #131a23; --muted: #5c6875;
+    --line: #cdd5df; --line2: #9aa6b3;
+    --rf: #0e7f8c; --rf-soft: #d6eef1; --code: #4b53cf; --code-soft: #e5e6fb;
+    --out: #1f8f66; --out-soft: #d7f0e5;
+    --shadow: 0 1px 2px rgba(20,30,45,.06), 0 6px 20px rgba(20,30,45,.06);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1015; --card: #151b24; --ink: #e7edf4; --muted: #92a0b1;
+    --line: #29333f; --line2: #3d4a58;
+    --rf: #43d1de; --rf-soft: #0f3239; --code: #9aa1ff; --code-soft: #1e2340;
+    --out: #4fd39a; --out-soft: #123329;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 72px; }
+  .mono { font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace; }
+
+  header.page { margin-bottom: 40px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--rf); font-weight: 600; margin: 0 0 10px;
+  }
+  h1 { font-size: clamp(26px, 4vw, 38px); line-height: 1.1; margin: 0 0 12px; text-wrap: balance; letter-spacing: -.01em; }
+  .lede { color: var(--muted); font-size: 16px; max-width: 62ch; margin: 0; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 18px 26px; margin: 22px 0 0; padding: 14px 18px;
+            background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .swatch { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+
+  section { margin-top: 46px; }
+  .fig-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+  .fig-num { font-size: 13px; font-weight: 700; color: var(--rf); letter-spacing: .04em; }
+  h2 { font-size: 21px; margin: 0; letter-spacing: -.01em; }
+  .fig-sub { color: var(--muted); font-size: 14.5px; margin: 4px 0 18px; max-width: 70ch; }
+
+  figure { margin: 0; }
+  .canvas {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 10px; overflow-x: auto;
+  }
+  .canvas svg { display: block; width: 100%; height: auto; min-width: 720px; }
+  figcaption { color: var(--muted); font-size: 13.5px; margin-top: 14px; padding-left: 2px; }
+  figcaption code { font-family: ui-monospace, Menlo, monospace; color: var(--code);
+    background: var(--code-soft); padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
+
+  /* ---- shared SVG element styling (theme-aware via tokens) ---- */
+  svg .card    { fill: var(--card); stroke: var(--line2); stroke-width: 1.4; }
+  svg .card-rf { fill: var(--rf-soft); stroke: var(--rf); stroke-width: 1.5; }
+  svg .card-out{ fill: var(--out-soft); stroke: var(--out); stroke-width: 1.5; }
+  svg .title   { fill: var(--ink); font-weight: 650; }
+  svg .code    { fill: var(--code); font-family: ui-monospace, Menlo, monospace; }
+  svg .sub     { fill: var(--muted); }
+  svg .port    { fill: var(--muted); font-family: ui-monospace, Menlo, monospace; }
+  svg .wire    { stroke: var(--line2); stroke-width: 1.8; fill: none; }
+  svg .wire-dash { stroke: var(--line2); stroke-width: 1.6; fill: none; stroke-dasharray: 5 5; }
+  svg .releq   { fill: var(--rf); font-family: ui-monospace, Menlo, monospace; font-weight: 600; }
+  svg .pillbg  { fill: var(--rf-soft); stroke: var(--rf); stroke-width: 1.2; }
+  svg .badge   { fill: var(--out); font-family: ui-monospace, Menlo, monospace; font-weight: 600; }
+  svg .badgebg { fill: var(--out-soft); stroke: var(--out); stroke-width: 1; }
+  svg text     { font-family: system-ui, sans-serif; }
+</style>
+
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow">mimsim · microwave impedance microscopy simulator</p>
+    <h1>Code structure &amp; circuit–to–code map</h1>
+    <p class="lede">Two diagrams: the Python package's module-dependency structure, and how each physical device in the MIM signal chain maps to a code class and its ports.</p>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--rf)"></span>physical RF path / solver</span>
+      <span><span class="swatch" style="background:var(--code)"></span>code identifier (class / function)</span>
+      <span><span class="swatch" style="background:var(--out)"></span>measured output / probeable quantity</span>
+    </div>
+  </header>
+
+  <!-- ============================ FIGURE 1 ============================ -->
+  <section>
+    <div class="fig-head"><span class="fig-num">Fig. 1</span><h2>Code structure (module dependencies)</h2></div>
+    <p class="fig-sub">Arrows point in the "depends on / uses" direction. Bottom: signal representation. Middle: the scattering-network solver and component base class. Top: concrete devices and domain models, then the public API.</p>
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 880 650" role="img" aria-label="mimsim module dependency structure">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="var(--line2)"/>
+            </marker>
+          </defs>
+
+          <!-- __init__.py -->
+          <g>
+            <rect class="card" x="150" y="20" width="580" height="58" rx="10"/>
+            <text class="mono code" x="170" y="44" font-size="14">__init__.py</text>
+            <text class="sub"  x="170" y="63" font-size="12.5">public API — <tspan class="mono">from mimsim import Network, Source, resonant_match, TipSampleModel …</tspan></text>
+          </g>
+
+          <!-- matching.py & sample.py -->
+          <g>
+            <rect class="card" x="150" y="120" width="270" height="86" rx="10"/>
+            <text class="mono code" x="168" y="145" font-size="13.5">matching.py</text>
+            <text class="mono code" x="168" y="167" font-size="12.5">resonant_match()</text>
+            <text class="sub" x="168" y="188" font-size="12">λ/4 resonant match (with mismatch/detuning)</text>
+          </g>
+          <g>
+            <rect class="card" x="460" y="120" width="270" height="86" rx="10"/>
+            <text class="mono code" x="478" y="145" font-size="13.5">sample.py</text>
+            <text class="mono code" x="478" y="167" font-size="12.5">TipSampleModel · response_curve</text>
+            <text class="sub" x="478" y="188" font-size="12">tip–sample admittance / response curve</text>
+          </g>
+
+          <!-- components.py -->
+          <g>
+            <rect class="card-rf" x="95" y="250" width="690" height="118" rx="12"/>
+            <text class="mono code" x="115" y="276" font-size="14">components.py</text>
+            <text class="sub" x="115" y="296" font-size="12.5">concrete RF devices — each implements <tspan class="mono">s_matrix(f, t)</tspan></text>
+            <text class="mono title" x="115" y="322" font-size="12.5">Source · Attenuator · PhaseShifter · DirectionalCoupler · MatchingNetwork</text>
+            <text class="mono title" x="115" y="344" font-size="12.5">Amplifier · IQMixer · Termination · Load</text>
+            <text class="mono sub" x="115" y="362" font-size="11.5">series_L / shunt_C / tline … (ABCD element helpers)</text>
+          </g>
+
+          <!-- network.py -->
+          <g>
+            <rect class="card-rf" x="95" y="410" width="690" height="132" rx="12"/>
+            <text class="mono code" x="115" y="436" font-size="14">network.py</text>
+            <text class="sub" x="115" y="456" font-size="12.5">scattering-network solver + component base class + signal extraction</text>
+            <text class="mono title" x="115" y="482" font-size="12.5">Component (base/ABC) · Port · Network · Result · SolveResult</text>
+            <rect class="pillbg" x="115" y="498" width="300" height="30" rx="8"/>
+            <text class="releq" x="130" y="518" font-size="14">( I − S·P )·b = b_src</text>
+            <text class="sub" x="430" y="518" font-size="12">one linear solve at the carrier frequency</text>
+          </g>
+
+          <!-- signal.py -->
+          <g>
+            <rect class="card" x="95" y="584" width="690" height="52" rx="10"/>
+            <text class="mono code" x="115" y="608" font-size="13.5">signal.py</text>
+            <text class="mono title" x="115" y="626" font-size="12">Signal — envelope · waveform()  <tspan class="sub">time domain</tspan>  · spectrum()  <tspan class="sub">frequency domain</tspan></text>
+          </g>
+
+          <!-- arrows (depends-on, downward) -->
+          <!-- init -> matching / sample -->
+          <path class="wire" d="M285,78 L285,120" marker-end="url(#ah)"/>
+          <path class="wire" d="M595,78 L595,120" marker-end="url(#ah)"/>
+          <text class="sub" x="300" y="104" font-size="11">re-exports</text>
+          <!-- matching -> components -->
+          <path class="wire" d="M285,206 L285,250" marker-end="url(#ah)"/>
+          <text class="sub mono" x="298" y="232" font-size="11">builds MatchingNetwork</text>
+          <!-- sample -> components -->
+          <path class="wire" d="M595,206 L595,250" marker-end="url(#ah)"/>
+          <text class="sub mono" x="608" y="232" font-size="11">builds Load</text>
+          <!-- components -> network -->
+          <path class="wire" d="M440,368 L440,410" marker-end="url(#ah)"/>
+          <text class="sub mono" x="452" y="392" font-size="11">subclass Component</text>
+          <!-- network -> signal -->
+          <path class="wire" d="M440,542 L440,584" marker-end="url(#ah)"/>
+          <text class="sub mono" x="452" y="568" font-size="11">solve() → Signal per port</text>
+        </svg>
+      </div>
+      <figcaption>Dependencies converge downward: the domain layer (<code>matching.py</code>, <code>sample.py</code>) assembles circuits from the component layer; every component class subclasses <code>Component</code> and implements <code>s_matrix(f,t)</code>; the solver wraps each port wave as a <code>Signal</code>.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================ FIGURE 2 ============================ -->
+  <section>
+    <div class="fig-head"><span class="fig-num">Fig. 2</span><h2>Circuit structure and its code mapping</h2></div>
+    <p class="fig-sub">The MIM reflectometer as three arms tapped from one source (cf. paper Fig. 1a). <strong>Excitation</strong> drives the tip; <strong>cancellation</strong> (voltage-controlled attenuator&nbsp;A + phase shifter&nbsp;ϕ) synthesizes a wave that <strong>meets the reflected wave at the combiner and nulls the carrier</strong> before amplification; <strong>reference</strong> (phase shifter&nbsp;ϕ) sets the LO phase for the IQ mixer.</p>
+    <figure>
+      <div class="canvas">
+        <svg viewBox="0 0 1200 480" role="img" aria-label="MIM three-arm signal chain to code mapping">
+          <defs>
+            <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="var(--line2)"/>
+            </marker>
+          </defs>
+
+          <!-- arm eyebrow labels -->
+          <text x="300" y="46" font-size="10.5" fill="var(--rf)" font-weight="600" letter-spacing="1.6">EXCITATION</text>
+          <text x="300" y="294" font-size="10.5" fill="var(--rf)" font-weight="600" letter-spacing="1.6">CANCELLATION</text>
+          <text x="300" y="396" font-size="10.5" fill="var(--rf)" font-weight="600" letter-spacing="1.6">REFERENCE</text>
+
+          <!-- reflected return path (dashed, top) -->
+          <path class="wire-dash" d="M643,60 L643,30 L352,30 L352,60" marker-end="url(#ah2)"/>
+          <text class="sub" x="415" y="24" font-size="11">reflected wave (carries tip–sample information)</text>
+
+          <!-- ===== Source and source split ===== -->
+          <rect class="card-rf" x="28" y="180" width="104" height="92" rx="10"/>
+          <text class="title" x="80" y="214" font-size="13" text-anchor="middle">Source</text>
+          <text class="code mono" x="80" y="232" font-size="10" text-anchor="middle">Source(f0)</text>
+          <text class="badge" x="80" y="250" font-size="8.5" text-anchor="middle">tunable amp</text>
+          <text class="badge" x="80" y="262" font-size="8.5" text-anchor="middle">tunable freq</text>
+          <path class="wire" d="M132,226 L160,226" marker-end="url(#ah2)"/>
+
+          <rect class="card-rf" x="160" y="190" width="88" height="72" rx="9"/>
+          <text class="title" x="204" y="214" font-size="10.5" text-anchor="middle">Coupler</text>
+          <text class="code mono" x="204" y="230" font-size="8" text-anchor="middle">DirectionalCoupler</text>
+          <text class="sub" x="204" y="246" font-size="8" text-anchor="middle">source split</text>
+
+          <rect class="card-rf" x="160" y="312" width="88" height="64" rx="9"/>
+          <text class="title" x="204" y="336" font-size="10.5" text-anchor="middle">Coupler</text>
+          <text class="code mono" x="204" y="351" font-size="8" text-anchor="middle">DirectionalCoupler</text>
+          <text class="sub" x="204" y="366" font-size="8" text-anchor="middle">ref / cancel split</text>
+          <path class="wire" d="M204,262 L204,312" marker-end="url(#ah2)"/>
+
+          <!-- ===== EXCITATION arm ===== -->
+          <path class="wire" d="M248,210 L274,210 L274,96 L300,96" marker-end="url(#ah2)"/>
+          <rect class="card-rf" x="300" y="60" width="104" height="72" rx="10"/>
+          <text class="title" x="352" y="84" font-size="11" text-anchor="middle">Coupler</text>
+          <text class="code mono" x="352" y="100" font-size="8" text-anchor="middle">DirectionalCoupler</text>
+          <text class="sub" x="352" y="116" font-size="8" text-anchor="middle">excite / reflect</text>
+
+          <path class="wire" d="M404,96 L440,96" marker-end="url(#ah2)"/>
+          <text class="port" x="405" y="90" font-size="8.5">through</text>
+          <rect class="card-rf" x="440" y="66" width="104" height="60" rx="10"/>
+          <text class="title" x="492" y="90" font-size="11.5" text-anchor="middle">Matching</text>
+          <text class="code mono" x="492" y="107" font-size="9.5" text-anchor="middle">resonant_match()</text>
+          <text class="sub" x="492" y="120" font-size="8.5" text-anchor="middle">λ/4 resonator</text>
+
+          <path class="wire" d="M544,96 L580,96" marker-end="url(#ah2)"/>
+          <rect class="card-rf" x="580" y="66" width="126" height="60" rx="10"/>
+          <text class="title" x="643" y="88" font-size="12" text-anchor="middle">Tip – sample</text>
+          <text class="code mono" x="643" y="104" font-size="9" text-anchor="middle">TipSampleModel</text>
+          <text class="code mono" x="643" y="118" font-size="9" text-anchor="middle">.make_load → Load</text>
+
+          <!-- probe annotation on Matching.out node -->
+          <circle cx="544" cy="96" r="4" fill="var(--out)"/>
+          <path class="wire" d="M544,96 L544,152 L520,152" stroke="var(--out)" stroke-dasharray="3 3" marker-end="url(#ah2)"/>
+          <rect class="badgebg" x="360" y="140" width="176" height="28" rx="8"/>
+          <text class="badge" x="371" y="152" font-size="9">probe any port</text>
+          <text class="sub mono" x="371" y="164" font-size="8">res.voltage / incident / reflected</text>
+
+          <!-- ===== CANCELLATION arm ===== -->
+          <path class="wire" d="M248,332 L300,332" marker-end="url(#ah2)"/>
+          <text class="port" x="252" y="326" font-size="8.5">coupled</text>
+          <rect class="card-rf" x="300" y="302" width="104" height="60" rx="10"/>
+          <text class="title" x="352" y="324" font-size="11.5" text-anchor="middle">Attenuator</text>
+          <text class="code mono" x="352" y="340" font-size="9.5" text-anchor="middle">Attenuator</text>
+          <text class="badge" x="352" y="354" font-size="8.5" text-anchor="middle">V-controlled A</text>
+
+          <path class="wire" d="M404,332 L440,332" marker-end="url(#ah2)"/>
+          <rect class="card-rf" x="440" y="302" width="104" height="60" rx="10"/>
+          <text class="title" x="492" y="324" font-size="11.5" text-anchor="middle">Phase shifter</text>
+          <text class="code mono" x="492" y="340" font-size="9.5" text-anchor="middle">PhaseShifter</text>
+          <text class="badge" x="492" y="354" font-size="8.5" text-anchor="middle">V-controlled ϕ</text>
+
+          <!-- ===== REFERENCE arm ===== -->
+          <path class="wire" d="M204,376 L204,431 L300,431" marker-end="url(#ah2)"/>
+          <rect class="card-rf" x="300" y="404" width="104" height="54" rx="10"/>
+          <text class="title" x="352" y="425" font-size="11.5" text-anchor="middle">Phase shifter</text>
+          <text class="code mono" x="352" y="440" font-size="9.5" text-anchor="middle">PhaseShifter</text>
+          <text class="badge" x="352" y="452" font-size="8.5" text-anchor="middle">V-ctrl LO phase</text>
+
+          <!-- ===== Combiner: reflected meets cancellation ===== -->
+          <path class="wire" d="M352,132 L352,222 L620,222" marker-end="url(#ah2)"/>
+          <text class="port" x="356" y="180" font-size="8.5">isolated (reflected)</text>
+          <path class="wire" d="M544,332 L672,332 L672,274" marker-end="url(#ah2)"/>
+          <text class="port" x="548" y="326" font-size="8.5">cancellation</text>
+
+          <rect class="card-rf" x="620" y="170" width="104" height="104" rx="11"/>
+          <text class="title" x="672" y="206" font-size="11.5" text-anchor="middle">Combiner</text>
+          <text class="code mono" x="672" y="222" font-size="8" text-anchor="middle">DirectionalCoupler</text>
+          <text class="badge" x="672" y="240" font-size="8.5" text-anchor="middle">carrier null</text>
+          <text class="sub" x="672" y="254" font-size="7.5" text-anchor="middle">reflected + cancel</text>
+
+          <!-- combiner -> amplifier -> mixer RF -->
+          <path class="wire" d="M724,222 L760,222" marker-end="url(#ah2)"/>
+          <rect class="card-rf" x="760" y="192" width="104" height="60" rx="10"/>
+          <text class="title" x="812" y="216" font-size="12" text-anchor="middle">Amplifier</text>
+          <text class="code mono" x="812" y="234" font-size="9" text-anchor="middle">Amplifier(gain_db)</text>
+
+          <path class="wire" d="M864,222 L904,222" marker-end="url(#ah2)"/>
+          <text class="port" x="866" y="216" font-size="8.5">rf</text>
+
+          <!-- reference -> mixer LO -->
+          <path class="wire" d="M404,431 L884,431 L884,320 L904,320" marker-end="url(#ah2)"/>
+          <text class="port" x="866" y="314" font-size="8.5">lo</text>
+
+          <!-- ===== IQ Mixer ===== -->
+          <rect class="card-rf" x="904" y="150" width="122" height="200" rx="12"/>
+          <text class="title" x="965" y="256" font-size="14" text-anchor="middle">IQ mixer</text>
+          <text class="code mono" x="965" y="276" font-size="10.5" text-anchor="middle">IQMixer</text>
+          <text class="sub mono" x="965" y="294" font-size="9" text-anchor="middle">.demodulate()</text>
+
+          <!-- outputs -->
+          <path class="wire" d="M1026,210 L1050,210" marker-end="url(#ah2)"/>
+          <path class="wire" d="M1026,290 L1050,290" marker-end="url(#ah2)"/>
+          <rect class="card-out" x="1052" y="194" width="110" height="32" rx="8"/>
+          <text x="1107" y="214" font-size="12" text-anchor="middle" fill="var(--out)" font-weight="600" font-family="ui-monospace, Menlo, monospace">MIM-Re</text>
+          <rect class="card-out" x="1052" y="274" width="110" height="32" rx="8"/>
+          <text x="1107" y="294" font-size="12" text-anchor="middle" fill="var(--out)" font-weight="600" font-family="ui-monospace, Menlo, monospace">MIM-Im</text>
+        </svg>
+      </div>
+      <figcaption>One <code>Source</code> feeds three arms. <strong>Excitation:</strong> <code>DirectionalCoupler → resonant_match → Load</code>. The reflection leaves the excitation coupler's <code>isolated</code> port and meets the <strong>cancellation</strong> wave — synthesized by the voltage-controlled <code>Attenuator</code> + <code>PhaseShifter</code> — at the <strong>combiner</strong>, nulling the carrier before <code>Amplifier</code> → <code>IQMixer</code> RF. The <strong>reference</strong> <code>PhaseShifter</code> supplies the LO phase. <code>demodulate()</code> → MIM-Re / MIM-Im. Green dot: any port yields a time- or frequency-domain signal after solving.</figcaption>
+    </figure>
+  </section>
+</div>
