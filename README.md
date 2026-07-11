@@ -40,7 +40,7 @@ physical. Time-varying control is handled by re-solving on the slow-time grid.
 | `mim_gui_demo.ipynb`   | one-click notebook to open the panel |
 | `MIMSimulationFull.ipynb` | worked demo of every feature (executed, with figures) |
 | `smoke_test.py` · `build_notebook.py` | self-check · (re)generate the demo notebook |
-| `docs/`                | tutorials (EN/中文, full + undergrad) and architecture diagrams as HTML + PDF |
+| `docs/`                | tutorials (EN/中文) and architecture diagrams as HTML + PDF |
 
 ## Quick start
 
