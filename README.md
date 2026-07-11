@@ -148,7 +148,6 @@ The base package (`mimsim/*.py`) is untouched by the GUIs; they only drive it.
 
 - `tutorial.pdf` / `tutorial_cn.pdf` — full derivation (EN / 中文): scattering solve,
   component S-matrices, matching, tip-sample response, cancellation, modulation.
-- `tutorial_intro.pdf` / `tutorial_intro_cn.pdf` — undergraduate-friendly guide (EN / 中文).
 - `architecture.pdf` — code-structure and circuit-to-code diagrams.
 
 ## Run it
