@@ -43,11 +43,15 @@ class TipSampleModel:
         coupling capacitance: C_coupling(z) = C_coupling * z0 / (z0 + z).
     """
 
-    def __init__(self, C_probe=1e-12, C_coupling=1e-18, g=5e-7, z0=10e-9):
+    def __init__(self, C_probe=1e-12, C_coupling=1e-18, g=5e-7, z0=10e-9, Q_probe=np.inf):
         self.C_probe = float(C_probe)
         self.C_coupling = float(C_coupling)
         self.g = float(g)
         self.z0 = float(z0)
+        # finite probe quality factor -> a small self-loss G = w*C_probe/Q_probe.
+        # Needed for a fixed matching bridge to produce real |Gamma| dips; the
+        # default (inf) keeps the probe lossless for the idealized response curve.
+        self.Q_probe = float(Q_probe)
 
     # -- admittances --------------------------------------------------------
     def coupling_cap(self, z=0.0):
@@ -70,9 +74,10 @@ class TipSampleModel:
         return 1.0 / Z_ts
 
     def Y_total(self, f, rho, eps_r=10.0, z=0.0):
-        """Total probe admittance: self-capacitance plus tip-sample term."""
+        """Total probe admittance: self-capacitance (+ its loss) plus tip-sample term."""
         w = 2 * np.pi * f
-        return 1j * w * self.C_probe + self.Y_tipsample(f, rho, eps_r, z)
+        G_probe = w * self.C_probe / self.Q_probe if np.isfinite(self.Q_probe) else 0.0
+        return 1j * w * self.C_probe + G_probe + self.Y_tipsample(f, rho, eps_r, z)
 
     # -- component factory --------------------------------------------------
     def make_load(self, rho, eps_r=10.0, z=0.0, name="tip_sample"):

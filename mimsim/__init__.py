@@ -26,7 +26,7 @@ from .components import (
     abcd_to_s, db_to_lin_amp,
 )
 from .sample import TipSampleModel, response_curve, EPS0
-from .matching import resonant_match
+from .matching import resonant_match, lambda4_bridge
 
 __version__ = "0.1.0"
 
@@ -36,5 +36,5 @@ __all__ = [
     "Termination", "Load", "MatchingNetwork", "IQMixer", "DemodResult",
     "series_Z", "shunt_Y", "series_L", "series_C", "series_R",
     "shunt_L", "shunt_C", "shunt_R", "tline", "abcd_to_s", "db_to_lin_amp",
-    "TipSampleModel", "response_curve", "EPS0", "resonant_match",
+    "TipSampleModel", "response_curve", "EPS0", "resonant_match", "lambda4_bridge",
 ]

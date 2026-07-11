@@ -17,9 +17,34 @@ from __future__ import annotations
 
 import numpy as np
 
-from .components import MatchingNetwork, shunt_L, tline
+from .components import MatchingNetwork, shunt_L, series_C, tline
 
 C_LIGHT = 299792458.0
+
+
+def lambda4_bridge(length=0.10, Z_line=150.0, C_series=0.12e-12, eps_eff=1.0,
+                   Z0=50.0, name="bridge"):
+    """A *fixed* quarter-wave transmission-line bridge with a series coupling cap.
+
+    Unlike :func:`resonant_match`, nothing here is tuned to a chosen frequency:
+    the line length is a physical constant (~10 cm), so matching happens only at
+    the line's resonances -- a comb of roughly equally-spaced frequencies
+    ``~ n * C_LIGHT/(2*length*sqrt(eps_eff))``.  A small series coupling capacitor
+    ``C_series`` sets how tightly the 50 ohm line couples into the probe
+    resonator, and hence how deep each match is (toward critical coupling).
+
+    Real MIM workflow: sweep the source frequency to find the matched teeth, park
+    on one, then tune the cancellation attenuator and phase.  Requires a probe
+    with finite loss (finite Q) for the matches to be real (see ``Q_probe`` in
+    :class:`~mimsim.sample.TipSampleModel`).
+
+    Elements, line side -> probe side: series C_series, then the fixed line.
+    """
+    net = MatchingNetwork([series_C(C_series), tline(Z_line, length, eps_eff)],
+                          Z0=Z0, name=name)
+    net.design = dict(length=length, Z_line=Z_line, C_series=C_series, eps_eff=eps_eff,
+                      comb_spacing_hz=C_LIGHT / (2.0 * length * np.sqrt(eps_eff)))
+    return net
 
 
 def resonant_match(f0, C_probe=1e-12, Q=40.0, Z0=50.0, eps_eff=1.0,
